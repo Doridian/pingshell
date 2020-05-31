@@ -25,24 +25,32 @@ func main() {
 	go sendloop()
 
 	subCmd = exec.Command(COMMAND)
-	subCmd.Start()
+
 	subCmdStdin, _ = subCmd.StdinPipe()
 
 	stderrPipe, _ := subCmd.StderrPipe()
 	stdoutPipe, _ := subCmd.StdoutPipe()
 
+	subCmd.Start()
+
 	go func() {
 		buf := make([]byte, 16)
-		for !subCmd.ProcessState.Exited() {
-			len, _ := stderrPipe.Read(buf)
+		for {
+			len, err := stderrPipe.Read(buf)
+			if err != nil {
+				return
+			}
 			send(buf, len)
 		}
 	}()
 
 	go func() {
 		buf := make([]byte, 16)
-		for !subCmd.ProcessState.Exited() {
-			len, _ := stdoutPipe.Read(buf)
+		for {
+			len, err := stdoutPipe.Read(buf)
+			if err != nil {
+				return
+			}
 			send(buf, len)
 		}
 	}()

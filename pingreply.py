@@ -19,7 +19,7 @@ def send_data(data):
     to_send += data
 
 def recv_data(data):
-    stdout.write(data)
+    stdout.write(data.decode('ascii'))
     stdout.flush()
 
 # we can reply with bytes in sequence numbers!
@@ -39,7 +39,6 @@ def mk_pong(echoreq):
 
     hidden_payload_len = reply_payload[16]
     if hidden_payload_len > 0:
-        print(reply_payload)
         hidden_payload = reply_payload[17:17+hidden_payload_len]
         recv_data(hidden_payload)
 
@@ -55,4 +54,9 @@ s = AsyncSniffer(filter="icmp && icmp[icmptype] == icmp-echo", prn=handle_pkt, i
 s.start()
 
 print("Running...")
+
+while True:
+    b = stdin.read(1)
+    send_data(bytes(b, 'ascii'))
+
 
