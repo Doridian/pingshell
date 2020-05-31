@@ -3,7 +3,8 @@ from scapy.all import *
 from random import randrange
 from sys import stdout, stdin, argv
 
-IFACE = "docker0"
+IFACE = argv[1]
+RHOST = argv[2]
 
 # \xde\xad\xbe\xef\xca\xfe\xba\xbe\xb0\x0b\xfa\xce\xb0\x0c\xab\xcd = max payload length = 16
 # ping -W 1 -c 1 $RHOST -p '0123456789abcdef0123456789abcdef'
@@ -50,10 +51,10 @@ def resp(pkt, tosend):
 def handle_pkt(pkt):
     resp(pkt, mk_pong(pkt))
 
-s = AsyncSniffer(filter="icmp && icmp[icmptype] == icmp-echo && ip src %s" % argv[1], prn=handle_pkt, iface=IFACE)
+s = AsyncSniffer(filter="icmp && icmp[icmptype] == icmp-echo && ip src %s" % RHOST, prn=handle_pkt, iface=IFACE)
 s.start()
 
-print("Running...")
+print("Waiting on RHOST...")
 
 while True:
     b = stdin.read(1)

