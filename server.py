@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from scapy.all import *
+from scapy.all import IP, ICMP, Raw, sendp, Ether, AsyncSniffer
 from random import randrange
 from sys import stdout, stdin, argv
 
@@ -54,7 +54,7 @@ def handle_pkt(pkt):
 s = AsyncSniffer(filter="icmp && icmp[icmptype] == icmp-echo && ip src %s" % RHOST, prn=handle_pkt, iface=IFACE)
 s.start()
 
-print("Waiting on RHOST...")
+print("Waiting on %s over %s" % (RHOST, IFACE))
 
 while True:
     b = stdin.read(1)
