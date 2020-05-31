@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from scapy.all import *
 from random import randrange
-from sys import stdout, stdin
+from sys import stdout, stdin, argv
 
 IFACE = "docker0"
 
@@ -50,7 +50,7 @@ def resp(pkt, tosend):
 def handle_pkt(pkt):
     resp(pkt, mk_pong(pkt))
 
-s = AsyncSniffer(filter="icmp && icmp[icmptype] == icmp-echo", prn=handle_pkt, iface=IFACE)
+s = AsyncSniffer(filter="icmp && icmp[icmptype] == icmp-echo && ip src %s" % argv[1], prn=handle_pkt, iface=IFACE)
 s.start()
 
 print("Running...")
@@ -59,4 +59,4 @@ while True:
     b = stdin.read(1)
     send_data(bytes(b, 'ascii'))
 
-
+s.stop()

