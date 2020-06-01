@@ -56,8 +56,13 @@ s.start()
 
 print("Waiting on %s over %s" % (RHOST, IFACE))
 
-while True:
-    b = stdin.read(1)
-    send_data(bytes(b, 'ascii'))
+try:
+    while True:
+        b = stdin.read(1)
+        send_data(bytes(b, 'ascii'))
+except KeyboardInterrupt:
+    pass
+
+print("Good bye")
 
 s.stop()
